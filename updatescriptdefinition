@@ -6,18 +6,18 @@ require('dotenv').config();
 const fs = require('fs');
 
 async function main(configurationId, mimeType, description, passEntity, type) {
-    const clientid = process.env.CLIENTID;
-    const clientsecret = process.env.CLIENTSECRET
-    const username = process.env.USERNAME;
-    const password = process.env.PASSWORD;
-    const tenant = process.env.TENANT;
+    const clientid = process.env.XILLIO_CLIENTID;
+    const clientsecret = process.env.XILLIO_CLIENTSECRET
+    const username = process.env.XILLIO_USERNAME;
+    const password = process.env.XILLIO_PASSWORD;
+    const tenant = process.env.XILLIO_TENANT;
 
     async function getToken() {
         const authentication = await request({
             method: 'POST',
             uri: `${tenant}/oauth/token`,
             headers: {
-                'Authorization': 'Basic ' + new Buffer(clientid + ':' + clientsecret).toString('base64'),
+                'Authorization': 'Basic ' + Buffer.from(clientid + ':' + clientsecret).toString('base64'),
                 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
             },
             json: true,

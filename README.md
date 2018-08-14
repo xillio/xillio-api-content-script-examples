@@ -10,11 +10,11 @@ To prepare your environment to use the scripts that interact with Xillio you nee
 2. Create a `.env` file in the root of the project directory with the following information
 
 ```env
-TENANT=https://<yourtenant>.xill.io
-USERNAME=<user>
-PASSWORD=<password>
-CLIENTID=<clientid>
-CLIENTSECRET=<clientsecret>
+XILLIO_TENANT=https://<yourtenant>.xill.io
+XILLIO_USERNAME=<user>
+XILLIO_PASSWORD=<password>
+XILLIO_CLIENTID=<clientid>
+XILLIO_CLIENTSECRET=<clientsecret>
 ```
 
 Please enter the appropriate information for your Xillio environment.
