@@ -1,13 +1,13 @@
 # Xillio API content script examples
 
-This project contains examples of Xillio API content script.
+This project contains examples of Xillio API content script. See <https://docs.xill.io/#ContentScripts> for more information.
 
 To develop content scripts you develop them locally using a local instance of nodejs. You can use the `testlocal` command to test your content script. With `uploadscript` and `updatescriptdefinition` you can add your script to a configuration Xillio. With `testapi` you can test your newly created or updated content script. See below for a description of these commands.
 
 To prepare your environment to use the scripts that interact with Xillio you need to run the following steps.
 
 1. Run `npm install` to install dependencies
-2. Create a '.env' file with the following information
+2. Create a `.env` file in the root of the project directory with the following information
 
 ```env
 TENANT=https://<yourtenant>.xill.io
@@ -67,12 +67,30 @@ Expected output:
 
 ## Upload script
 
-Run `uploadscript <configurationId> <mimeType> <contentScriptFileName>` to upload the content script to the specified configuration.
+Use `uploadscript` to upload the content script to the specified configuration.
+
+### Upload script usage
+
+```sh
+uploadscript <configurationId> <mimeType> <contentScriptFileName>
+```
 
 ## Update script definition
 
-Run `updatescriptdefinition <configurationid> <mimeType> <description> [<passEntity>] [type]` to update the description, passEntity or type field for a content script.
+Use `updatescriptdefinition` to update the description, passEntity or type field for a content script.
+
+### Update script definition usage
+
+```sh
+updatescriptdefinition <configurationid> <mimeType> <description> [<passEntity>] [<type>]
+```
 
 ## Test the uploaded script
 
-Run `testapi <configurationid> <mimeType> <path>` to test your script. The mimeType should match the mimeType of a configured content script.
+Use `testapi`  to test your script. The mimeType should match the mimeType of a configured content script.
+
+### Test api usage
+
+```sh
+testapi <configurationid> <mimeType> <path>
+```
