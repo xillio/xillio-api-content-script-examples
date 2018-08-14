@@ -1,0 +1,17 @@
+{
+  "name": "xillio-api-content-script-examples",
+  "version": "1.0.0",
+  "description": "This project contains examples of Xillio API content script.",
+  "author": "Jeroen Huinink <jeroen.huinink@xillio.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "dotenv": "^6.0.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2"
+  },
+  "homepage": "https:/docs.xill.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xillio/xillio-api-content-script-examples.git"
+  }
+}

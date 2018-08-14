@@ -1,0 +1,96 @@
+#!/usr/bin/env node
+
+const request = require('request-promise');
+require('dotenv').config();
+
+const fs = require('fs');
+
+
+async function main(configurationId, mimeType, contentScriptFileName) {
+    const clientid = process.env.CLIENTID;
+    const clientsecret = process.env.CLIENTSECRET
+    const username = process.env.USERNAME;
+    const password = process.env.PASSWORD;
+    const tenant = process.env.TENANT;
+
+    async function getToken() {
+        const authentication = await request({
+            method: 'POST',
+            uri: `${tenant}/oauth/token`,
+            headers: {
+                'Authorization': 'Basic ' + new Buffer(clientid + ':' + clientsecret).toString('base64'),
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+            json: true,
+            body: 'grant_type=password&username=' + username + '&password=' + password
+        })
+        return authentication["access_token"];
+    }
+
+    async function findExistingScript(configurationId, mimeType) {
+        const scripts = await request({
+            uri: `${tenant}/v2/configurations/${configurationId}/contentScripts`,
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            json: true,
+        });
+        return scripts.find((script) => script.mimeType === mimeType);
+    }
+
+    async function createNewContentScript(configurationId, mimeType, contentScriptFileName) {
+        const contentScriptDefinition = {
+            type: 'read',
+            mimeType: mimeType,
+            description: 'scriptFile: ' + contentScriptFileName
+        };
+
+        return request({
+            method: 'POST',
+            uri: `${tenant}/v2/configurations/${configurationId}/contentScripts/`,
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            body: contentScriptDefinition,
+            json: true
+        });
+    }
+
+    async function uploadContentScriptCode(configurationId, scriptId, contentScriptFileName) {
+        await request({
+            method: 'PUT',
+            uri: `${tenant}/v2/configurations/${configurationId}/contentScripts/${scriptId}/code`,
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            body: fs.createReadStream(__dirname + '/' + contentScriptFileName)
+        });
+    }
+
+    async function downloadContentScriptCode(configurationId, scriptId) {
+        return request({
+            method: 'GET',
+            uri: `${tenant}/v2/configurations/${configurationId}/contentScripts/${scriptId}/code`,
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        });
+    }
+
+    const token = await getToken();
+
+    const existingScript = await findExistingScript(configurationId, mimeType);
+    const newScript = (!existingScript) ? await createNewContentScript(configurationId, mimeType, contentScriptFileName) : null;
+
+    const script = existingScript ? existingScript : newScript;
+    await uploadContentScriptCode(configurationId, script.id, contentScriptFileName);
+    const code = await downloadContentScriptCode(configurationId, script.id);
+    console.log('script', script)
+    console.log('code', code);
+}
+
+const configurationId = process.argv[2];
+const mimeType = process.argv[3];
+const contentScriptFileName = process.argv[4];
+
+main(configurationId, mimeType, contentScriptFileName);

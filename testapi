@@ -1,0 +1,51 @@
+#!/usr/bin/env node
+
+const request = require('request-promise');
+require('dotenv').config();
+
+const fs = require('fs');
+
+
+async function main(configurationId, mimeType, path) {
+    const clientid = process.env.CLIENTID;
+    const clientsecret = process.env.CLIENTSECRET
+    const username = process.env.USERNAME;
+    const password = process.env.PASSWORD;
+    const tenant = process.env.TENANT;
+
+    async function getToken() {
+        const authentication = await request({
+            method: 'POST',
+            uri: `${tenant}/oauth/token`,
+            headers: {
+                'Authorization': 'Basic ' + new Buffer(clientid + ':' + clientsecret).toString('base64'),
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+            json: true,
+            body: 'grant_type=password&username=' + username + '&password=' + password
+        })
+        return authentication["access_token"];
+    }
+
+    async function getContents(configurationId, mimeType, path ) {
+        return await request({
+            uri: `${tenant}/v2/contents/${configurationId}/${path}`,
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Accept': mimeType ? mimeType : 'application/octet-stream'
+            },
+            json: true,
+        });
+    }
+
+    const token = await getToken();
+
+    const contents = await getContents(configurationId, mimeType, path);
+    console.log(contents);
+}
+
+const configurationId = process.argv[2];
+const mimeType = process.argv[3];
+const path = process.argv[4];
+
+main(configurationId, mimeType, path);

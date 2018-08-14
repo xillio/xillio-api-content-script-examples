@@ -1,0 +1,18 @@
+{
+    "test": "this is a string value",
+    "more": {
+        "complex": "this is also a string value",
+        "other": 1
+    },
+    "many more": [
+        1, 2, 3
+    ],
+    "weird names?": [
+        {
+            "with a lot  of sp@@@@@ce": 1
+        },
+        {
+            "wïth accents": 2
+        }
+    ]
+}

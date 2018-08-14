@@ -1,0 +1,74 @@
+#!/usr/bin/env node
+
+const request = require('request-promise');
+require('dotenv').config();
+
+const fs = require('fs');
+
+async function main(configurationId, mimeType, description, passEntity, type) {
+    const clientid = process.env.CLIENTID;
+    const clientsecret = process.env.CLIENTSECRET
+    const username = process.env.USERNAME;
+    const password = process.env.PASSWORD;
+    const tenant = process.env.TENANT;
+
+    async function getToken() {
+        const authentication = await request({
+            method: 'POST',
+            uri: `${tenant}/oauth/token`,
+            headers: {
+                'Authorization': 'Basic ' + new Buffer(clientid + ':' + clientsecret).toString('base64'),
+                'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+            },
+            json: true,
+            body: 'grant_type=password&username=' + username + '&password=' + password
+        })
+        return authentication["access_token"];
+    }
+
+    async function findExistingScript(configurationId, mimeType) {
+        const scripts = await request({
+            uri: `${tenant}/v2/configurations/${configurationId}/contentScripts`,
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            json: true,
+        });
+        return scripts.find((script) => script.mimeType === mimeType);
+    }
+
+    async function updateContentScript(configurationId, script, mimeType, description, passEntity, type) {
+        const contentScriptDefinition = {
+            type: type ? type : script.type,
+            mimeType: mimeType,
+            description: description,
+            passEntity: passEntity ? passEntity : script.passEntity
+        };
+        
+        return request({
+            method: 'PUT',
+            uri: `${tenant}/v2/configurations/${configurationId}/contentScripts/${script.id}`,
+            headers: {
+                'Authorization': 'Bearer ' + token
+            },
+            body: contentScriptDefinition,
+            json: true
+        });
+    }
+
+    const token = await getToken();
+
+    const script = await findExistingScript(configurationId, mimeType);
+
+    const updatedScript = await updateContentScript(configurationId, script, mimeType, description, passEntity, type);
+
+    console.log('script', updatedScript)
+}
+
+const configurationId = process.argv[2];
+const mimeType = process.argv[3];
+const description = process.argv[4];
+const passEntity = process.argv[5];
+const type = process.argv[6];
+
+main(configurationId, mimeType, description, passEntity, type);
